@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome to Liminal</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <h1>Welcome to Liminal</h1>
+
+    <form id="loginForm">
+        <label for="email">Enter Email Address: </label>
+        <input type="text" id="email">
+        <br>
+        <label for="password">Enter Password: </label>
+        <input type="password" id="password">
+
+        <div>
+            <input type="submit" value="Login">
+        </div>
+    </form>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent default form submission
+            
+            var email = document.getElementById("email").value;
+            var password = document.getElementById("password").value;
+            
+            // Define valid email/password combinations
+            var validUsers = {
+                "sarker.rajorshi@gmail.com": "rajorshi",
+                "nam.vu@gmail.com": "nathan"
+            };
+            
+            // Check if entered credentials are valid
+            if (validUsers.hasOwnProperty(email) && validUsers[email] === password) {
+                // Save the current cart to sessionStorage
+                var currentEmail = localStorage.getItem('email');
+                var currentCart = JSON.parse(localStorage.getItem(currentEmail)) || {};
+                sessionStorage.setItem(currentEmail, JSON.stringify(currentCart));
+
+                // Clear the current cart for the current user
+                localStorage.removeItem(currentEmail);
+
+                // Set the new email
+                localStorage.setItem('email', email);
+
+                // Load new cart or create a new one
+                var newCart = JSON.parse(sessionStorage.getItem(email)) || {};
+                localStorage.setItem(email, JSON.stringify(newCart));
+
+                // Redirect to the browse page
+                window.location.href = "browse.html";
+            } else {
+                // Invalid login
+                alert("Invalid login. Please try again.");
+            }
+        });
+    </script>
+</body>
+</html>

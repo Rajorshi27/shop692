@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout</title>
+  <style>
+    /* Add your CSS styles here */
+    .cart-item {
+      margin-bottom: 20px; /* Add spacing between cart items */
+    }
+
+    .cart-item img {
+      max-width: 100px;
+      height: auto;
+      margin-right: 10px;
+    }
+
+    .cart-item p {
+      margin: 5px 0;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .checkout-input {
+      margin-bottom: 10px;
+    }
+
+    .checkout-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Checkout</h1>
+
+  <h2>Cart Items</h2>
+  <div id="cart">
+    <!-- Cart items will be dynamically added here -->
+  </div>
+
+  <div id="total">
+    <!-- Total amount will be calculated and displayed here -->
+  </div>
+
+  <div class="section" id="promo-code">
+    <label for="promo">Enter Promo Code:</label>
+    <input type="text" id="promo" name="promo" class="checkout-input">
+    <button onclick="applyPromo()" class="checkout-button">Apply</button>
+    <p id="promo-used"></p> <!-- Display which promo code was used -->
+  </div>
+
+  <div class="section" id="credit-card-details">
+    <h2>Credit Card Details</h2>
+    <!-- Add input fields for credit card details here -->
+    <label for="card-number">Card Number:</label>
+    <input type="text" id="card-number" name="card-number" class="checkout-input" placeholder="Enter your card number"><br>
+    <label for="expiry-date">Expiry Date:</label>
+    <input type="text" id="expiry-date" name="expiry-date" class="checkout-input" placeholder="MM/YY"><br>
+    <label for="cvv">CVV:</label>
+    <input type="text" id="cvv" name="cvv" class="checkout-input" placeholder="Enter CVV">
+  </div>
+
+  <button onclick="placeOrder()" class="checkout-button">Place Order</button>
+
+  <script>
+    // Function to display cart items
+    function displayCartItems() {
+      var cartDiv = document.getElementById('cart');
+      var email = localStorage.getItem('email');
+      var cart = JSON.parse(localStorage.getItem(email)) || {};
+
+      // Check if cart is empty
+      if (Object.keys(cart).length === 0) {
+        cartDiv.innerHTML = '<p>No items in the cart</p>';
+      } else {
+        // Loop through cart items and display them
+        for (var productId in cart) {
+          var quantity = cart[productId];
+
+          // Create cart item container
+          var cartItemDiv = document.createElement('div');
+          cartItemDiv.classList.add('cart-item');
+
+          // Add image
+          var img = document.createElement('img');
+          img.src = getProductImageUrl(productId); // Get image URL based on product ID
+          cartItemDiv.appendChild(img);
+
+          // Add description, price, and quantity
+          var description = document.createElement('p');
+          description.textContent = getProductDescription(productId) + ' - $' + getProductPrice(productId) + ', Quantity: ' + quantity;
+          cartItemDiv.appendChild(description);
+
+          // Append cart item to cart container
+          cartDiv.appendChild(cartItemDiv);
+        }
+      }
+    }
+
+    // Function to calculate and display total amount
+    function calculateTotal() {
+      var email = localStorage.getItem('email');
+var cart = JSON.parse(localStorage.getItem(email)) || {};
+      var total = 0;
+
+      // Calculate total amount
+      if (cart) {
+        for (var productId in cart) {
+          // Add product price multiplied by quantity to the total
+          total += getProductPrice(productId) * cart[productId];
+        }
+      }
+
+      // Display total amount
+      document.getElementById('total').innerHTML = '<p><strong>Total: $' + total.toFixed(2) + '</strong></p>';
+    }
+
+    // Function to get product image URL based on product ID
+    function getProductImageUrl(productId) {
+      // Replace these URLs with your actual image URLs for each product
+      switch (parseInt(productId)) {
+        case 1:
+          return 'https://images.urbndata.com/is/image/UrbanOutfitters/87465456_004_b?$xlarge$&fit=constrain&fmt=webp&qlt=80&wid=540';
+        case 2:
+          return 'https://images.urbndata.com/is/image/UrbanOutfitters/87177341_021_b?$xlarge$&fit=constrain&fmt=webp&qlt=80&wid=540';
+        case 3:
+          return 'https://images.urbndata.com/is/image/UrbanOutfitters/88218532_041_b?$xlarge$&fit=constrain&fmt=webp&qlt=80&wid=540';
+        default:
+          return ''; // If no matching product ID is found, return an empty string
+      }
+    }
+
+    // Function to get product description based on product ID
+    function getProductDescription(productId) {
+      // Define product descriptions
+      var descriptions = {
+        1: 'Urban Renewal Remade Star Patch Hoodie Sweatshirt',
+        2: 'Silence + Noise Reagan Textured Boat Neck Sweater',
+        3: 'Strawberry Pullover Sweatshirt'
+      };
+      return descriptions[productId] || '';
+    }
+
+    // Function to get product price based on product ID
+    function getProductPrice(productId) {
+      // Define product prices
+      var prices = {
+        1: '40.00',
+        2: '30.00',
+        3: '35.00'
+      };
+      return parseFloat(prices[productId]) || 0;
+    }
+
+    // Function to apply promo code
+function applyPromo() {
+  var promoInput = document.getElementById('promo').value;
+  var total = parseFloat(document.getElementById('total').innerText.match(/\d+\.\d+/)[0]);
+
+  if (promoInput === '') {
+    document.getElementById('promo-used').textContent = 'Please enter a promo code';
+  } else if (promoInput === '50OFF') {
+    // Check if the promo code has already been applied
+    if (document.getElementById('promo-used').textContent.includes('50OFF')) {
+      document.getElementById('promo-used').textContent = 'Promo code "50OFF" has already been applied';
+      return; // Exit the function if promo code has already been used
+    }
+    total *= 0.5; // Apply 50% discount
+    document.getElementById('promo-used').textContent = 'Promo code "50OFF" applied';
+  } else {
+    document.getElementById('promo-used').textContent = 'Invalid promo code';
+  }
+
+  document.getElementById('total').innerHTML = '<p><strong>Total: $' + total.toFixed(2) + '</strong></p>';
+}
+
+    // Function to place an order
+    function placeOrder() {
+         // Get credit card details
+      var cardNumber = document.getElementById('card-number').value.trim();
+      var expiryDate = document.getElementById('expiry-date').value.trim();
+      var cvv = document.getElementById('cvv').value.trim();
+
+      // Validate credit card number
+      if (!isValidCardNumber(cardNumber)) {
+        alert('Please enter a valid credit card number.');
+        return; // Exit the function if credit card number is invalid
+      }
+
+      // Validate expiry date
+     if (!isValidExpiryDate(expiryDate)) {
+        alert('Please enter a valid expiry date.');
+         return; // Exit the function if expiry date is invalid
+     }
+      
+      // Validate CVV
+      if (!isValidCVV(cvv)) {
+        alert('Please enter a valid CVV.');
+        return; // Exit the function if CVV is invalid
+      }
+
+      // Check if any of the credit card fields are empty
+      if (cardNumber === '' || expiryDate === '' || cvv === '') {
+        alert('Please fill out all credit card details.');
+        return; // Exit the function if any field is empty
+      }
+
+      // Get cart items from localStorage
+      var email = localStorage.getItem('email');
+var cart = JSON.parse(localStorage.getItem(email)) || {};
+
+      // Calculate total amount
+      var total = 0;
+      for (var product in cart) {
+        total += getProductPrice(product) * cart[product];
+      }
+
+      // Get promo code
+      var promoCode = document.getElementById('promo').value;
+
+      // Apply promo code discount if valid
+      if (promoCode === '50OFF') {
+        total *= 0.5; // Apply 50% discount
+      }
+
+      // Create order object
+      var order = {
+        items: [],
+        total: total,
+        date: new Date(),
+        promoCode: promoCode // Store promo code with the order
+      };
+
+      // Populate order items
+      for (var product in cart) {
+        order.items.push({
+          description: getProductDescription(product),
+          quantity: cart[product]
+        });
+      }
+
+      // Save order to localStorage
+      var orders = JSON.parse(localStorage.getItem('orders')) || [];
+      orders.push(order);
+      localStorage.setItem('orders', JSON.stringify(orders));
+
+      // Clear the cart
+      localStorage.removeItem('cart');
+
+      // Redirect to order history page
+      window.location.href = 'orderhistory.html';
+    }
+
+    // Function to validate credit card number
+    function isValidCardNumber(cardNumber) {
+      return /^\d{16}$/.test(cardNumber);
+    }
+
+    // Function to validate expiry date
+    function isValidExpiryDate(expiryDate) {
+      var currentDate = new Date();
+     var enteredDate = new Date('20' + expiryDate.split('/')[1], expiryDate.split('/')[0] - 1, 1);
+     return enteredDate > currentDate; // Return true if expiry date is valid, false otherwise
+    }
+
+    // Function to validate CVV
+    function isValidCVV(cvv) {
+      return /^\d{3}$/.test(cvv);
+    }
+
+    // Call functions to display cart items and calculate total when the page loads
+    displayCartItems();
+    calculateTotal();
+  </script>
+</body>
+</html>

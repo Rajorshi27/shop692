@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Listing</title>
+  <style>
+    /* Add your CSS styles here */
+    body {
+      margin-top: 50px; /* Add margin to the top of the body */
+    }
+
+    img {
+      max-width: 150px; /* Decreased maximum width for images */
+      height: auto; /* Maintain aspect ratio */
+      display: block; /* Ensure images are displayed as blocks */
+      margin-bottom: 20px; /* Increased margin to add space between images and buttons */
+    }
+
+    input[type="submit"] {
+      padding: 12px 24px; /* Increased padding to make buttons bigger */
+      font-size: 18px; /* Increased font size */
+      cursor: pointer; /* Change cursor to pointer on hover */
+      background-color: #007bff; /* Change button color */
+      color: #fff; /* Change text color */
+      border: none; /* Remove border */
+      border-radius: 5px; /* Add border radius for rounded corners */
+      margin-bottom: 20px; /* Increased margin to add space between buttons and next image */
+    }
+
+    input[type="submit"]:hover {
+      background-color: #0056b3; /* Darker color on hover */
+    }
+
+    a.view-cart {
+      position: fixed; /* Position fixed to keep it in place */
+      top: 10px; /* 10px from the top */
+      right: 10px; /* 10px from the right */
+      padding: 10px 20px; /* Padding for button */
+      font-size: 16px; /* Font size */
+      background-color: #007bff; /* Button color */
+      color: #fff; /* Text color */
+      border: none; /* Remove border */
+      border-radius: 5px; /* Rounded corners */
+      text-decoration: none; /* Remove underline */
+    }
+
+    a.view-cart:hover {
+      background-color: #0056b3; /* Darker color on hover */
+    }
+
+    a.switch-account {
+      position: fixed; /* Position fixed to keep it in place */
+      top: 10px; /* 10px from the top */
+      left: 10px; /* 10px from the left */
+      padding: 10px 20px; /* Padding for button */
+      font-size: 16px; /* Font size */
+      background-color: #007bff; /* Button color */
+      color: #fff; /* Text color */
+      border: none; /* Remove border */
+      border-radius: 5px; /* Rounded corners */
+      text-decoration: none; /* Remove underline */
+    }
+
+    a.switch-account:hover {
+      background-color: #0056b3; /* Darker color on hover */
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- Add to Cart Form for Product 1 -->
+<form id="product1Form" action="#" onsubmit="return addToCart(1)">
+  <img src="https://images.urbndata.com/is/image/UrbanOutfitters/87465456_004_b?$xlarge$&fit=constrain&fmt=webp&qlt=80&wid=540" alt="Product 1 Image" style="margin-top: 20px;">
+  <!-- Added margin-top to the image -->
+  <p>Urban Renewal Remade Star Patch Hoodie Sweatshirt</p>
+  <p>$40.00</p>
+  <input type="hidden" name="product" value="1">
+  <input type="submit" value="Add to Cart">
+</form>
+
+<!-- Add to Cart Form for Product 2 -->
+<form id="product2Form" action="#" onsubmit="return addToCart(2)">
+  <img src="https://images.urbndata.com/is/image/UrbanOutfitters/87177341_021_b?$xlarge$&fit=constrain&fmt=webp&qlt=80&wid=540" alt="Product 2 Image">
+  <p>Silence + Noise Reagan Textured Boat Neck Sweater</p>
+  <p>$30.00</p>
+  <input type="hidden" name="product" value="2">
+  <input type="submit" value="Add to Cart">
+</form>
+
+<!-- Add to Cart Form for Product 3 -->
+<form id="product3Form" action="#" onsubmit="return addToCart(3)">
+  <img src="https://images.urbndata.com/is/image/UrbanOutfitters/88218532_041_b?$xlarge$&fit=constrain&fmt=webp&qlt=80&wid=540" alt="Product 3 Image">
+  <p>Strawberry Pullover Sweatshirt</p>
+  <p>$35.00</p>
+  <input type="hidden" name="product" value="3">
+  <input type="submit" value="Add to Cart">
+</form>
+
+<a href="cart.html" class="view-cart">View Cart</a>
+<a href="index.html" class="switch-account" onclick="switchAccount()">Switch Account</a>
+
+<script>
+  function switchAccount() {
+    // Save the current cart to sessionStorage
+    var email = localStorage.getItem('email');
+    var cartItems = JSON.parse(localStorage.getItem(email)) || {};
+    sessionStorage.setItem(email, JSON.stringify(cartItems));
+
+    // Redirect to the login page (replace with your login page URL)
+    window.location.href = 'login.html';
+  }
+</script>
+
+<script>
+  function addToCart(product) {
+    // Retrieve the cart from localStorage
+    var cart = localStorage.getItem('cart');
+    
+    alert("Product " + product + " added to " + cart);
+
+    // Retrieve the user's email from localStorage
+    var email = localStorage.getItem('email');
+
+    // Retrieve the cartItems object from localStorage based on the user's email
+    var cartItems = JSON.parse(localStorage.getItem(email)) || {};
+
+    // Check if the product already exists in the cart
+    if (cartItems.hasOwnProperty(product)) {
+        cartItems[product] += 1; // Increment the quantity if the product already exists
+    } else {
+        cartItems[product] = 1; // Otherwise, add the product with quantity 1
+    }
+
+    // Save the updated cartItems object back to localStorage
+    localStorage.setItem(email, JSON.stringify(cartItems));
+
+    
+  }
+</script>
+
+</body>
+</html>

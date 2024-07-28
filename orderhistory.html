@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order History</title>
+  <style>
+    /* Add your CSS styles here */
+    .order {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 20px;
+    }
+
+    .order img {
+      max-width: 100px;
+      height: auto;
+      margin-right: 10px;
+    }
+
+    .order p {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Order History</h1>
+
+  <div id="orders">
+    <!-- Orders will be dynamically added here -->
+  </div>
+
+  <script>
+    // Function to display order history
+    function displayOrderHistory() {
+      var ordersDiv = document.getElementById('orders');
+      var orders = JSON.parse(localStorage.getItem('orders'));
+
+      // Check if there are any orders
+      if (!orders || orders.length === 0) {
+        ordersDiv.innerHTML = '<p>No orders found</p>';
+      } else {
+        // Reverse the order of the array (most recent first)
+        orders.reverse();
+
+        // Loop through orders and display them
+        orders.forEach(function(order, index) {
+          var orderDiv = document.createElement('div');
+          orderDiv.classList.add('order');
+
+          // Display order number and date
+          var orderInfo = document.createElement('h2');
+          orderInfo.textContent = 'Order #' + (orders.length - index) + ' - ' + formatDate(order.date);
+          orderDiv.appendChild(orderInfo);
+
+          // Display order items
+          order.items.forEach(function(item) {
+            var itemDiv = document.createElement('div');
+
+            // Add image
+            var img = document.createElement('img');
+            img.src = getProductImageUrl(item.description);
+            itemDiv.appendChild(img);
+
+            // Add description and quantity
+            var description = document.createElement('p');
+            description.textContent = item.description + ', Quantity: ' + item.quantity;
+            itemDiv.appendChild(description);
+
+            orderDiv.appendChild(itemDiv);
+          });
+
+          // Display total
+          var total = document.createElement('p');
+          if (order.promoCode) {
+            total.innerHTML = '<strong>Total: $' + order.total.toFixed(2) + '</strong>';
+          }
+          orderDiv.appendChild(total);
+
+          // Append order to orders container
+          ordersDiv.appendChild(orderDiv);
+        });
+      }
+    }
+
+    // Function to format date in a readable format
+    function formatDate(dateString) {
+      var date = new Date(dateString);
+      return date.toLocaleString(); // Format date and time
+    }
+
+    // Function to get product image URL based on description
+    function getProductImageUrl(description) {
+      // Replace these URLs with your actual image URLs for each product
+      if (description.includes('Urban Renewal')) {
+        return 'https://images.urbndata.com/is/image/UrbanOutfitters/87465456_004_b?$xlarge$&fit=constrain&fmt=webp&qlt=80&wid=540';
+      } else if (description.includes('Silence + Noise')) {
+        return 'https://images.urbndata.com/is/image/UrbanOutfitters/87177341_021_b?$xlarge$&fit=constrain&fmt=webp&qlt=80&wid=540';
+      } else if (description.includes('Strawberry')) {
+        return 'https://images.urbndata.com/is/image/UrbanOutfitters/88218532_041_b?$xlarge$&fit=constrain&fmt=webp&qlt=80&wid=540';
+      } else {
+        return ''; // If no matching product description is found, return an empty string
+      }
+    }
+
+    // Call function to display order history when the page loads
+    displayOrderHistory();
+  </script>
+</body>
+</html>

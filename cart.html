@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart</title>
+  <style>
+    /* Style for cart items */
+    .cart-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px; /* Add spacing between cart items */
+    }
+
+    .cart-item img {
+      max-width: 100px;
+      height: auto;
+      margin-right: 20px;
+    }
+
+    .cart-item-details {
+      flex: 1;
+    }
+
+    .quantity-buttons button {
+      margin-right: 5px;
+    }
+
+    .proceed-to-checkout {
+      display: none; /* Initially hide the button */
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      text-decoration: none;
+      margin-top: 20px;
+    }
+
+    .total-price {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Shopping Cart</h1>
+
+  <div id="cart">
+    <!-- Cart items will be dynamically added here -->
+  </div>
+
+  <div class="total-price" id="total-price"></div>
+
+  <a href="browse.html" class="continue-shopping">Continue Shopping</a>
+
+  <a href="checkout.html" class="proceed-to-checkout" id="proceed-to-checkout">Proceed to Checkout</a>
+
+  <script>
+    // Function to display cart items
+    function displayCartItems() {
+      var cartDiv = document.getElementById('cart');
+      var email = localStorage.getItem('email');
+      var cart = JSON.parse(localStorage.getItem(email)) || {};
+
+      // Clear existing cart items from the DOM
+      cartDiv.innerHTML = '';
+
+      // Initialize total price
+      var totalPrice = 0;
+
+      // Check if cart is empty
+      if (Object.keys(cart).length === 0) {
+        cartDiv.innerHTML = '<p>No items in the cart</p>';
+      } else {
+        // Loop through cart items and display each one
+        Object.keys(cart).forEach(function(productId) {
+          var quantity = cart[productId];
+
+          // Calculate item price
+          var itemPrice = parseFloat(getProductPrice(productId)) * quantity;
+
+          // Add to total price
+          totalPrice += itemPrice;
+
+          // Create cart item container
+          var cartItemDiv = document.createElement('div');
+          cartItemDiv.classList.add('cart-item');
+
+          // Add image
+          var img = document.createElement('img');
+          img.src = getProductImageUrl(productId); // Get image URL based on product ID
+          cartItemDiv.appendChild(img);
+
+          // Add item details
+          var cartItemDetailsDiv = document.createElement('div');
+          cartItemDetailsDiv.classList.add('cart-item-details');
+
+          // Display product description, price, and quantity
+          cartItemDetailsDiv.innerHTML += '<p><strong>' + getProductDescription(productId) + '</strong></p>';
+          cartItemDetailsDiv.innerHTML += '<p>Price: $' + getProductPrice(productId) + '</p>';
+          cartItemDetailsDiv.innerHTML += '<p>Quantity: ';
+
+          // Add quantity buttons
+          var quantityButtonsDiv = document.createElement('div');
+          quantityButtonsDiv.classList.add('quantity-buttons');
+
+          var minusButton = document.createElement('button');
+          minusButton.textContent = '-';
+          minusButton.onclick = function() {
+            adjustQuantity(productId, -1);
+          };
+          quantityButtonsDiv.appendChild(minusButton);
+
+          var quantitySpan = document.createElement('span');
+          quantitySpan.textContent = quantity;
+          quantityButtonsDiv.appendChild(quantitySpan);
+
+          var plusButton = document.createElement('button');
+          plusButton.textContent = '+';
+          plusButton.onclick = function() {
+            adjustQuantity(productId, 1);
+          };
+          quantityButtonsDiv.appendChild(plusButton);
+
+          cartItemDetailsDiv.appendChild(quantityButtonsDiv);
+
+          // Append item details to cart item container
+          cartItemDiv.appendChild(cartItemDetailsDiv);
+
+          // Append cart item to cart container
+          cartDiv.appendChild(cartItemDiv);
+        });
+
+        // Display total price
+        var totalPriceDiv = document.getElementById('total-price');
+        totalPriceDiv.textContent = 'Total Price: $' + totalPrice.toFixed(2);
+
+        // Display "Proceed to Checkout" button
+        document.getElementById('proceed-to-checkout').style.display = 'inline-block';
+      }
+    }
+
+    // Function to get product image URL based on product ID
+    function getProductImageUrl(productId) {
+      // Replace these URLs with your actual image URLs for each product
+      switch (parseInt(productId)) {
+        case 1:
+          return 'https://images.urbndata.com/is/image/UrbanOutfitters/87465456_004_b?$xlarge$&fit=constrain&fmt=webp&qlt=80&wid=540';
+        case 2:
+          return 'https://images.urbndata.com/is/image/UrbanOutfitters/87177341_021_b?$xlarge$&fit=constrain&fmt=webp&qlt=80&wid=540';
+        case 3:
+          return 'https://images.urbndata.com/is/image/UrbanOutfitters/88218532_041_b?$xlarge$&fit=constrain&fmt=webp&qlt=80&wid=540';
+        default:
+          return ''; // If no matching product ID is found, return an empty string
+      }
+    }
+
+    // Function to get product description based on product ID
+    function getProductDescription(product) {
+      // Define product descriptions
+      var descriptions = {
+        1: 'Urban Renewal Remade Star Patch Hoodie Sweatshirt',
+        2: 'Silence + Noise Reagan Textured Boat Neck Sweater',
+        3: 'Strawberry Pullover Sweatshirt'
+      };
+      return descriptions[product] || '';
+    }
+
+    // Function to get product price based on product ID
+    function getProductPrice(product) {
+      // Define product prices
+      var prices = {
+        1: '40.00',
+        2: '30.00',
+        3: '35.00'
+      };
+      return prices[product] || '';
+    }
+
+    // Function to adjust quantity
+    function adjustQuantity(productId, delta) {
+      var email = localStorage.getItem('email');
+      var cart = JSON.parse(localStorage.getItem(email)) || {};
+      cart[productId] = (cart[productId] || 0) + delta;
+      if (cart[productId] <= 0) {
+        delete cart[productId]; // Remove product if quantity becomes zero or negative
+      }
+      localStorage.setItem(email, JSON.stringify(cart));
+      displayCartItems(); // Refresh the display
+    }
+
+    // Call the function to display cart items when the page loads
+    displayCartItems();
+  </script>
+</body>
+</html>
